@@ -41,6 +41,21 @@ public class UserService {
         return toDto(saved);
     }
 
+    @Autowired
+    private com.example.socialmedia.security.JwtUtil jwtUtil;
+
+    public AuthResponse loginAndGetToken(UserLoginDto loginDto) {
+        User user = userRepository.findByUsername(loginDto.getUsernameOrEmail())
+                .or(() -> userRepository.findByEmail(loginDto.getUsernameOrEmail()))
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (!passwordEncoder.matches(loginDto.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
+        String token = jwtUtil.generateToken(user.getUsername());
+        return new AuthResponse(toDto(user), token);
+    }
+
+    // Legacy method for compatibility (can be removed if not used)
     public UserDto authenticateUser(UserLoginDto loginDto) {
         User user = userRepository.findByUsername(loginDto.getUsernameOrEmail())
                 .or(() -> userRepository.findByEmail(loginDto.getUsernameOrEmail()))

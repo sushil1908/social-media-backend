@@ -26,8 +26,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<UserDto>> login(@RequestBody UserLoginDto loginDto) {
-        UserDto userDto = userService.authenticateUser(loginDto);
-        return ResponseEntity.ok(ApiResponse.success("Login successful", userDto));
+    public ResponseEntity<ApiResponse<com.example.socialmedia.service.AuthResponse>> login(@RequestBody UserLoginDto loginDto) {
+        com.example.socialmedia.service.AuthResponse authResponse = userService.loginAndGetToken(loginDto);
+        return ResponseEntity.ok(ApiResponse.success("Login successful", authResponse));
     }
 }

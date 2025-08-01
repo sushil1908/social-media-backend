@@ -1,5 +1,6 @@
 package com.example.socialmedia.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +11,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -18,8 +21,9 @@ public class SecurityConfig {
                 .requestMatchers("/ping", "/h2-console/**", "/api/v1/auth/register", "/api/v1/auth/login", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll() // Allow public access to ping, H2 console, auth, and Swagger
                 .anyRequest().authenticated()
             )
-            .formLogin(withDefaults())
+
             .csrf(csrf -> csrf.disable()) // Disable CSRF for H2 and testing
+            .addFilterBefore(jwtAuthenticationFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
             .headers(headers -> headers.frameOptions().disable()); // Disable X-Frame-Options for H2 console
 
         return http.build();
