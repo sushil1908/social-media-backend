@@ -55,6 +55,21 @@ public class UserService {
         return new AuthResponse(toDto(user), token);
     }
 
+    public UserDto getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        return toDto(user);
+    }
+
+    public UserDto updateUserProfile(String username, com.example.socialmedia.dto.UserProfileUpdateDto profileDto) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setFirstName(profileDto.getFirstName());
+        user.setLastName(profileDto.getLastName());
+        User saved = userRepository.save(user);
+        return toDto(saved);
+    }
+
     // Legacy method for compatibility (can be removed if not used)
     public UserDto authenticateUser(UserLoginDto loginDto) {
         User user = userRepository.findByUsername(loginDto.getUsernameOrEmail())
