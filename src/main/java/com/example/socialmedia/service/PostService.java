@@ -8,6 +8,8 @@ import com.example.socialmedia.model.User;
 import com.example.socialmedia.repository.PostRepository;
 import com.example.socialmedia.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,8 +34,12 @@ public class PostService {
         return toDto(saved);
     }
 
-    public List<PostDto> getAllPosts() {
-        return postRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
+    public Page<PostDto> getAllPosts(Pageable pageable) {
+        return postRepository.findAll(pageable).map(this::toDto);
+    }
+
+    public Page<PostDto> getPostsByUsername(String username, Pageable pageable) {
+        return postRepository.findByAuthor_Username(username, pageable).map(this::toDto);
     }
 
     public PostDto getPostById(Long id) {

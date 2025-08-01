@@ -25,9 +25,24 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PostDto>>> getAllPosts() {
-        List<PostDto> posts = postService.getAllPosts();
+    public ResponseEntity<ApiResponse<org.springframework.data.domain.Page<PostDto>>> getAllPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("createdAt").descending());
+        var posts = postService.getAllPosts(pageable);
         return ResponseEntity.ok(ApiResponse.success("All posts fetched", posts));
+    }
+
+    @GetMapping("/user/{username}")
+    public ResponseEntity<ApiResponse<org.springframework.data.domain.Page<PostDto>>> getPostsByUsername(
+            @PathVariable String username,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, org.springframework.data.domain.Sort.by("createdAt").descending());
+        var posts = postService.getPostsByUsername(username, pageable);
+        return ResponseEntity.ok(ApiResponse.success("User posts fetched", posts));
     }
 
     @GetMapping("/{id}")
